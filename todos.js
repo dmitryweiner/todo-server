@@ -1,13 +1,16 @@
 const express = require('express');
-const { nanoid } = require("nanoid");
+const { getRandomError } = require('./randomError');
+const { nanoid } = require('nanoid');
 const db = require('./db').getDb().get('todos');
 const router = express.Router();
 
 router.get('/', (req, res) => {
+    getRandomError();
     res.json(db.value());
 });
 
 router.post('/', (req, res) => {
+    getRandomError();
     // check if empty
     if (req.body.title === undefined || typeof req.body.title !== 'string' || req.body.title.length === 0) {
         const error = new Error('No title provided');
@@ -27,11 +30,12 @@ router.post('/', (req, res) => {
         title: req.body.title,
         isChecked: false
     }
-    res.json(db.push(newItem).write());
+    db.push(newItem).write();
     res.json(newItem);
 });
 
 router.put('/:id', (req, res) => {
+    getRandomError();
     let item = db.find({id: req.params.id}).value();
 
     if (!item) {
@@ -44,7 +48,6 @@ router.put('/:id', (req, res) => {
     item.isChecked = !!req.body.isChecked; // forgive me
 
     db.find({id: item.id}).assign(item).write();
-
     res.json(item);
 });
 
