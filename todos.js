@@ -1,16 +1,22 @@
 const express = require('express');
-const { getRandomError } = require('./randomError');
+const { getRandomError, shouldDropConnection } = require('./randomError');
 const { nanoid } = require('nanoid');
 const db = require('./db').getDb().get('todos');
 const router = express.Router();
 
 router.get('/', (req, res) => {
-    getRandomError();
+    if (shouldDropConnection()) {
+        return res.connection.end();
+    }
+    getRandomError(res);
     res.json(db.value());
 });
 
 router.post('/', (req, res) => {
-    getRandomError();
+    if (shouldDropConnection()) {
+        return res.connection.end();
+    }
+    getRandomError(res);
     // check if empty
     if (req.body.title === undefined || typeof req.body.title !== 'string' || req.body.title.length === 0) {
         const error = new Error('No title provided');
@@ -35,7 +41,10 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-    getRandomError();
+    if (shouldDropConnection()) {
+        return res.connection.end();
+    }
+    getRandomError(res);
     let item = db.find({id: req.params.id}).value();
 
     if (!item) {
