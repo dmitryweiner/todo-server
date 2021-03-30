@@ -1,9 +1,11 @@
 # Учебный сервер, который временами генерирует ошибки
+* С вероятностью 50% сервер возвращает случайную ошибку.
+* С вероятностью 10% сервер рвёт соединение.
 
 ## Технологии
-* Express
-* LowDB
-* Nanoid
+* [Express.js](https://expressjs.com/)
+* [LowDB.js](https://github.com/typicode/lowdb)
+* [Nanoid](https://github.com/ai/nanoid)
 
 ## Установка
 ```shell
