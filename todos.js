@@ -1,63 +1,91 @@
 const express = require('express');
-const { getRandomError, shouldDropConnection } = require('./randomError');
+const { getRandomError, shouldDropConnection, unpredictableDelay } = require('./randomError');
 const { nanoid } = require('nanoid');
 const db = require('./db').getDb().get('todos');
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    if (shouldDropConnection()) {
-        return res.connection.end();
-    }
-    getRandomError(res);
-    res.json(db.value());
+router.get('/', (req, res, next) => {
+    unpredictableDelay(() => {
+        if (shouldDropConnection()) {
+            return res.connection.end();
+        }
+
+        const error = getRandomError(res);
+        if (error) {
+            return next(error);
+        }
+
+        res.json(db.value());
+    });
 });
 
-router.post('/', (req, res) => {
-    if (shouldDropConnection()) {
-        return res.connection.end();
-    }
-    getRandomError(res);
-    // check if empty
-    if (req.body.title === undefined || typeof req.body.title !== 'string' || req.body.title.length === 0) {
-        const error = new Error('No title provided');
-        error.status = 400;
-        throw error;
-    }
+router.post('/', (req, res, next) => {
+    unpredictableDelay(() => {
+        if (shouldDropConnection()) {
+            return res.connection.end();
+        }
 
-    // check if exists
-    if (db.find({title: req.body.title}).value()) {
-        const error = new Error('This item already exists');
-        error.status = 400;
-        throw error;
-    }
+        const error = getRandomError(res);
+        if (error) {
+            return next(error);
+        }
 
-    const newItem = {
-        id: nanoid(),
-        title: req.body.title,
-        isChecked: false
-    }
-    db.push(newItem).write();
-    res.json(newItem);
+        // check if empty
+        if (req.body.title === undefined || typeof req.body.title !== 'string' || req.body.title.length === 0) {
+            const error = new Error('No title provided');
+            error.status = 400;
+            return next(error);
+        }
+
+        // check if exists
+        if (db.find({title: req.body.title}).value()) {
+            const error = new Error('This item already exists');
+            error.status = 400;
+            return next(error);
+        }
+
+        const newItem = {
+            id: nanoid(),
+            title: req.body.title,
+            isChecked: false
+        }
+        db.push(newItem).write();
+        res.json(newItem);
+    });
 });
 
-router.put('/:id', (req, res) => {
-    if (shouldDropConnection()) {
-        return res.connection.end();
-    }
-    getRandomError(res);
-    let item = db.find({id: req.params.id}).value();
+router.put('/:id', (req, res, next) => {
+    unpredictableDelay(() => {
+        if (shouldDropConnection()) {
+            return res.connection.end();
+        }
 
-    if (!item) {
-        const error = new Error('Item not found');
-        error.status = 404;
-        throw error;
-    }
+        const error = getRandomError(res);
+        if (error) {
+            return next(error);
+        }
 
-    item.title = "" + req.body.title;
-    item.isChecked = !!req.body.isChecked; // forgive me
 
-    db.find({id: item.id}).assign(item).write();
-    res.json(item);
+        let item = db.find({id: req.params.id}).value();
+
+        if (!item) {
+            const error = new Error('Item not found');
+            error.status = 404;
+            return next(error);
+        }
+
+        if (db.find({title: req.body.title}).value()) {
+            const error = new Error('This item already exists');
+            error.status = 400;
+            return next(error);
+        }
+
+        item.title = "" + req.body.title;
+        item.isChecked = !!req.body.isChecked; // forgive me
+
+        db.find({id: item.id}).assign(item).write();
+        res.json(item);
+    });
 });
 
 module.exports = router;
