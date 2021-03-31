@@ -2,11 +2,26 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('./db').initDb();
 const todosRoute = require('./todos');
+const { getRandomError, shouldDropConnection, unpredictableDelay } = require('./randomError');
 const router = express.Router();
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.all('*', function(req, res, next) {
+    unpredictableDelay(() => {
+        if (shouldDropConnection()) {
+            return res.connection.end();
+        }
+
+        const error = getRandomError(res);
+        if (error) {
+            return next(error);
+        }
+        next();
+    });
+});
 
 app.use(express.Router().get('/', (req, res) => res.json({ ok: true })));
 
