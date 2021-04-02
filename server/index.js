@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('./db').initDb();
 const todosRoute = require('./routes/todos');
+const authRoute = require('./routes/auth');
 const { getRandomError, shouldDropConnection, unpredictableDelay } = require('./randomError');
 const router = express.Router();
 const app = express();
@@ -26,6 +27,7 @@ app.all('*', function(req, res, next) {
 app.use(express.Router().get('/', (req, res) => res.json({ ok: true })));
 
 app.use('/todos', todosRoute);
+app.use('/auth', authRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
