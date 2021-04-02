@@ -1,11 +1,19 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 require('./db').initDb();
 const todosRoute = require('./routes/todos');
 const authRoute = require('./routes/auth');
 const { getRandomError, shouldDropConnection, unpredictableDelay } = require('./randomError');
 const router = express.Router();
 const app = express();
+
+app.use(
+    cors({
+        credentials: true,
+        origin: true
+    })
+);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
