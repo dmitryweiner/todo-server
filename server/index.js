@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 require('./db').initDb();
-const todosRoute = require('./todos');
+const todosRoute = require('./routes/todos');
 const { getRandomError, shouldDropConnection, unpredictableDelay } = require('./randomError');
 const router = express.Router();
 const app = express();

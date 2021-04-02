@@ -1,6 +1,6 @@
 const express = require('express');
 const { nanoid } = require('nanoid');
-const db = require('./db').getDb().get('todos');
+const db = require('../db').getDb().get('todos');
 const router = express.Router();
 
 router.get('/', (req, res, next) => {
