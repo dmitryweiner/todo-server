@@ -47,6 +47,19 @@ router.put('/:id', (req, res, next) => {
     res.json(item);
 });
 
+router.delete('/:id', (req, res, next) => {
+    let item = db.find({id: req.params.id}).value();
+
+    if (!item) {
+        const error = new Error('Item not found');
+        error.status = 404;
+        return next(error);
+    }
+
+    db.remove({id: item.id}).write();
+    res.json(item);
+});
+
 function validateTodo({title}) {
     let error;
     if (title === undefined || typeof title !== 'string' || title.length === 0) {
