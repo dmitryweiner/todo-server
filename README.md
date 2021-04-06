@@ -17,6 +17,22 @@ npm i
 npm start
 ```
 
+## Обращение к серверу
+При отправке запросов с телом в формате ```JSON``` требуется отправлять заголовок ```Content-Type```:
+
+```js
+const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        title: 'Кушоц'
+    })
+});
+const data = await response.json();
+```
+
 ## API entries
 
 ### Элементы списка дел ```/todos```
