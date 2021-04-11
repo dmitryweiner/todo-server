@@ -7,6 +7,18 @@ router.get('/', (req, res, next) => {
     res.json(db.value());
 });
 
+router.get('/:id', (req, res, next) => {
+    let item = db.find({id: req.params.id}).value();
+
+    if (!item) {
+        const error = new Error('Item not found');
+        error.status = 404;
+        return next(error);
+    }
+
+    res.json(item);
+});
+
 router.post('/', (req, res, next) => {
     const error = validateTodo({title: req.body.title});
     if (error) {

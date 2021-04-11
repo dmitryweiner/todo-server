@@ -54,6 +54,16 @@ const data = await response.json();
 ]
 ```
 
+#### GET /todos/:id
+Получение элемента по ID.
+```json
+{
+  "id": "dfh2vml5el6br7g8",
+  "title": "Покормить цветы",
+  "isChecked": true
+}
+```
+
 #### POST /todos
 Создание нового элемента.
 ```json
