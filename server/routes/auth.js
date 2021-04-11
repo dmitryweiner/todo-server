@@ -3,6 +3,7 @@ const db = require('../db').getDb().get('todos');
 const router = express.Router();
 
 let isAuth = false;
+let useAuth = false;
 
 router.get('/', (req, res, next) => {
     res.json({ isAuth });
@@ -26,4 +27,21 @@ router.delete('/', (req, res, next) => {
     res.json({ isAuth });
 });
 
-module.exports = router;
+function setUseAuth(newValue) {
+    useAuth = newValue;
+}
+
+function getUseAuth() {
+    return useAuth;
+}
+
+function getIsAuth() {
+    return isAuth;
+}
+
+module.exports = {
+    router,
+    getIsAuth,
+    getUseAuth,
+    setUseAuth
+};

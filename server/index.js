@@ -3,10 +3,11 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 require('./db').initDb();
 const todosRoute = require('./routes/todos');
-const authRoute = require('./routes/auth');
+const { router: authRoute, setUseAuth, getUseAuth } = require('./routes/auth');
 const { getRandomError, shouldDropConnection, unpredictableDelay } = require('./randomError');
 const router = express.Router();
 const app = express();
+setUseAuth(process.argv[2] === 'useAuth');
 
 app.use(
     cors({
@@ -54,5 +55,13 @@ app.use(function (err, req, res, next) {
 });
 
 const PORT = process.env.PORT || 3001;
+
+console.log('Starting server...');
+
+if (getUseAuth()) {
+    console.log('Authentication enabled.');
+} else {
+    console.log('Use useAuth parameter to enable authentication.');
+}
 
 app.listen(PORT, '0.0.0.0', () => console.log(`Server is live at http://localhost:${PORT}`));

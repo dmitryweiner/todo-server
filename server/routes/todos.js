@@ -2,6 +2,16 @@ const express = require('express');
 const { nanoid } = require('nanoid');
 const db = require('../db').getDb().get('todos');
 const router = express.Router();
+const { getIsAuth, getUseAuth } = require('./auth');
+
+router.all('*', function(req, res, next) {
+    if (getUseAuth() && !getIsAuth()) {
+        const error = new Error('Not authorized');
+        error.status = 403;
+        return next(error);
+    }
+    next();
+});
 
 router.get('/', (req, res, next) => {
     res.json(db.value());
