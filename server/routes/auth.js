@@ -6,7 +6,13 @@ let isAuth = false;
 let useAuth = false;
 
 router.get('/', (req, res, next) => {
-    res.json({ isAuth });
+    if (isAuth) {
+        return res.json({ isAuth });
+    }
+
+    const error = new Error('Not authorized');
+    error.status = 403;
+    return next(error);
 });
 
 router.post('/', (req, res, next) => {
